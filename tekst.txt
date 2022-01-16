@@ -17,7 +17,7 @@ stun
 admission
 whisper
 professor
-AIDS
+aids
 cruel
 thrust
 facade
