@@ -2,7 +2,36 @@
 #include <vector>
 #include <string>
 #include <fstream>
+#include <algorithm>
+#include <cctype>
 
+bool stringCompare(std::string left, std::string right)
+{
+    int size = 0;
+    if (left.size() < right.size())
+    {
+        size = left.size();
+    }
+    else
+    {
+        size = right.size();
+    }
+    for (int i = 0; i < size; i++)
+    {
+        if (std::tolower(left[i]) > std::tolower(right[i]))
+        {
+            return true;
+        }
+        else
+        {
+            if (std::tolower(left[i]) < std::tolower(right[i]))
+            {
+                return false;
+            }
+        }
+    }
+    return false;
+}
 void menu(bool sortType, bool sortOrder)
 {
     std::cout << "\n1. Wczytaj.\nTyp sortowania: ";
@@ -31,41 +60,40 @@ void readFromFile(std::vector<std::string>* dictionary)
 {
     dictionary->clear();                                        //czysczenie tablicy na wypadek, gdyby byly w niej juz zapisane jakies dane
     std::fstream file;                                          //strumien danych z pliku
-    std::string pathToFile, line;                               
+    std::string pathToFile, line;
 
     std::cout << "Podaj sciezke do pliku: ";
     std::cin >> pathToFile;
 
-    file.open(pathToFile,std::ios::in);                         //otwieranie pliku w trtybie tylko do odczytu
+    file.open(pathToFile, std::ios::in);                         //otwieranie pliku w trtybie tylko do odczytu
     int spacePosition;                                          //oddzielanie numeracji od wyrazow
-    std::getline(file, line);
-    do
+    while (std::getline(file, line))
     {
-        std::getline(file, line);
-        spacePosition = line.find(" ");
-        if(spacePosition!=-1)
-            line = line.substr(spacePosition+1);                
-        dictionary->push_back(line);                            //dodawanie wyrazow na koniec tablicy
-    } while (line != "");
-
-    dictionary->pop_back();                                     //(*dictionary).pop_back();
+        if (line != "l.p. word")
+        {
+            spacePosition = line.find(" ");
+            if (spacePosition != -1)
+                line = line.substr(spacePosition + 1);
+            dictionary->push_back(line);
+        }
+    }
     file.close();
 
     std::cout << "Plik zostal wczytany.\n";
 }
 void bubbleSort(std::vector<std::string>* dictionary)
 {
-    bool flag = true;  
+    bool flag = true;
     std::string tmp;                                         //czy zostala dokonana jakas zmiana
     while (flag)
     {
         flag = false;
-        for(int i=0; i<dictionary->size()-1; i++ )
+        for (int i = 0; i < dictionary->size() - 1; i++)
         {
-            if ((*dictionary)[i] > (*dictionary)[i + 1])
+            if (stringCompare((*dictionary)[i], (*dictionary)[i + 1]))
             {
                 flag = true;
-               
+
                 tmp = (*dictionary)[i];
                 (*dictionary)[i] = (*dictionary)[i + 1];
                 (*dictionary)[i + 1] = tmp;
@@ -80,11 +108,11 @@ int part(std::vector<std::string>* dictionary, int start, int end)
     std::string tmp;
     while (1)
     {
-        while ((*dictionary)[j] > x)
+        while (stringCompare((*dictionary)[j], x))
         {
             j--;
         }
-        while ((*dictionary)[i] < x)
+        while (stringCompare(x, (*dictionary)[i]))
         {
             i++;
         }
@@ -181,10 +209,57 @@ void remove(std::vector<std::string>* dictionary)
 }
 void display(std::vector<std::string> dictionary)
 {
+    std::string header = "|l.p.", separator = "|", header1 = "word";
+    int initialHeaderLength = header.length(), longest = 0;
+    int max_length = std::to_string(dictionary.size()).length();
     for (int i = 0; i < dictionary.size(); i++)
     {
-        std::cout << dictionary[i] << std::endl;
+        if (dictionary[i].length() > longest)
+        {
+            longest = dictionary[i].length();
+        }
     }
+    if (max_length < initialHeaderLength)
+    {
+        max_length = initialHeaderLength;
+    }
+    else
+    {
+        for (int i = 0; i < max_length - initialHeaderLength; i++)
+        {
+            header += " ";
+        }
+    }
+    header += "\t|" + header1;
+    for (int i = header1.length(); i < longest; i++)
+    {
+        header += " ";
+    }
+    header += "|";
+    for (int i = separator.length(); i < header.length(); i++)
+    {
+        separator += "-";
+    }
+    separator += "-|";
+    std::cout << separator << std::endl;
+    std::cout << header << std::endl;
+    std::cout << separator << std::endl;
+    for (int i = 0; i < dictionary.size(); i++)
+    {
+        std::cout << "|" << i + 1 << ".";
+        for (int j = 0; j < max_length - std::to_string(i + 1).length(); j++)
+        {
+            std::cout << " ";
+        }
+        std::cout << "\t|" << dictionary[i];
+        for (int j = dictionary[i].length(); j < longest; j++)
+        {
+            std::cout << " ";
+        }
+        std::cout << "|" << std::endl;
+        //std::cout << dictionary[i] << std::endl;
+    }
+    std::cout << separator;
 }
 void save(std::vector<std::string> dictionary)
 {
@@ -193,11 +268,11 @@ void save(std::vector<std::string> dictionary)
     std::cout << "Podaj sciezke do zapisu: ";
     std::cin >> pathToFile;
 
-    file.open(pathToFile,std::ios::out);                //jesli plik nie istnieje to zostaje utworzony
-    file << "l.p.  word \n";
-    for (int i = 0 ; i < dictionary.size(); i++)
-    { 
-        file << i+1 << ". " << dictionary[i] << std::endl;
+    file.open(pathToFile, std::ios::out);                //jesli plik nie istnieje to zostaje utworzony
+    file << "l.p. word\n";
+    for (int i = 0; i < dictionary.size(); i++)
+    {
+        file << i + 1 << ". " << dictionary[i] << std::endl;
     }
 
     std::cout << "Plik zostal zapisany.\n";
