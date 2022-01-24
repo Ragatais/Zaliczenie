@@ -2,8 +2,7 @@
 #include <vector>
 #include <string>
 #include <fstream>
-#include <algorithm>
-#include <cctype>
+#include <cctype>           //string compare
 
 bool stringCompare(std::string left, std::string right)
 {
@@ -14,17 +13,17 @@ bool stringCompare(std::string left, std::string right)
     }
     else
     {
-        size = right.size();
+        size = right.size();                //ktory wyraz ma mniej liter
     }
     for (int i = 0; i < size; i++)
     {
-        if (std::tolower(left[i]) > std::tolower(right[i]))
+        if (std::tolower(left[i]) > std::tolower(right[i]))         //wyrazy w zlej kolejnosci
         {
             return true;
         }
         else
         {
-            if (std::tolower(left[i]) < std::tolower(right[i]))
+            if (std::tolower(left[i]) < std::tolower(right[i]))    //wyrazy w dobrej kolejnosci
             {
                 return false;
             }
@@ -65,7 +64,7 @@ void readFromFile(std::vector<std::string>* dictionary)
     std::cout << "Podaj sciezke do pliku: ";
     std::cin >> pathToFile;
 
-    file.open(pathToFile, std::ios::in);                         //otwieranie pliku w trtybie tylko do odczytu
+    file.open(pathToFile, std::ios::in);                         //otwieranie pliku w trtybie tylko do odczytu         
     int spacePosition;                                          //oddzielanie numeracji od wyrazow
     while (std::getline(file, line))
     {
@@ -73,7 +72,7 @@ void readFromFile(std::vector<std::string>* dictionary)
         {
             spacePosition = line.find(" ");
             if (spacePosition != -1)
-                line = line.substr(spacePosition + 1);
+                line = line.substr(spacePosition + 1);      //usuwanie numeracji
             dictionary->push_back(line);
         }
     }
@@ -90,7 +89,7 @@ void bubbleSort(std::vector<std::string>* dictionary)
         flag = false;
         for (int i = 0; i < dictionary->size() - 1; i++)
         {
-            if (stringCompare((*dictionary)[i], (*dictionary)[i + 1]))
+            if (stringCompare((*dictionary)[i], (*dictionary)[i + 1]))      
             {
                 flag = true;
 
@@ -103,16 +102,16 @@ void bubbleSort(std::vector<std::string>* dictionary)
 }
 int part(std::vector<std::string>* dictionary, int start, int end)
 {
-    std::string x = (*dictionary)[(start + end) / 2];
+    std::string x = (*dictionary)[(start + end) / 2];       //dictionary[srodek tablicy]
     int i = start, j = end;
     std::string tmp;
     while (1)
     {
-        while (stringCompare((*dictionary)[j], x))
+        while (stringCompare((*dictionary)[j], x))          
         {
             j--;
         }
-        while (stringCompare(x, (*dictionary)[i]))
+        while (stringCompare(x, (*dictionary)[i]))           
         {
             i++;
         }
@@ -154,24 +153,22 @@ void reverse(std::vector<std::string>* dictionary)
 
     }
 }
-void length(std::vector<std::string>* dictionary)
+void length(std::vector<std::string> dictionary)
 {
-    int longest=0, shortest=INT_MAX, longestPosition=0, shortestPosition=8;
-    for (int i = 0; i < dictionary->size(); i++)
+    std::string longest = "", shortest = dictionary[0];
+    for (int i = 0; i < dictionary.size(); i++)
     {
-        if ((*dictionary)[i].length() > longest)
+        if ((dictionary)[i].length() > longest.length())
         {
-            longest = (*dictionary)[i].length();
-            longestPosition = i;
+            longest = (dictionary)[i];
         }
-        if ((*dictionary)[i].length() < shortest)
+        if ((dictionary)[i].length() < shortest.length())
         {
-            shortest = (*dictionary)[i].length();
-            shortestPosition = i;
+            shortest = (dictionary)[i];
         }
     }
-    std::cout << "Najdluzszy wyraz: " << (*dictionary)[longestPosition] << std::endl;
-    std::cout << "Najkrotszy wyraz: " << (*dictionary)[shortestPosition] << std::endl;
+    std::cout << "Najdluzszy wyraz: " << longest << std::endl;
+    std::cout << "Najkrotszy wyraz: " << shortest << std::endl;
 }
 void add(std::vector<std::string>* dictionary)
 {
@@ -185,10 +182,10 @@ void add(std::vector<std::string>* dictionary)
 void remove(std::vector<std::string>* dictionary)
 {
     std::string word;
-    bool flag = true;
+    bool flag = true;                           
     std::cout << "Podaj wyraz, ktory chcesz usunac: ";
     std::cin >> word;
-    for (auto i = dictionary->begin(); i != dictionary->end(); )
+    for (auto i = dictionary->begin(); i != dictionary->end(); )                              //iterator potrzebny do funkcji erase
     {
         if (*i == word)
         {
@@ -210,8 +207,8 @@ void remove(std::vector<std::string>* dictionary)
 void display(std::vector<std::string> dictionary)
 {
     std::string header = "|l.p.", separator = "|", header1 = "word";
-    int initialHeaderLength = header.length(), longest = 0;
-    int max_length = std::to_string(dictionary.size()).length();
+    int initialHeaderLength = header.length(), longest = 0;                         
+    int max_length = std::to_string(dictionary.size()).length();                        
     for (int i = 0; i < dictionary.size(); i++)
     {
         if (dictionary[i].length() > longest)
@@ -225,7 +222,7 @@ void display(std::vector<std::string> dictionary)
     }
     else
     {
-        for (int i = 0; i < max_length - initialHeaderLength; i++)
+        for (int i = initialHeaderLength; i < max_length; i++)         
         {
             header += " ";
         }
@@ -316,7 +313,7 @@ int main()
                 reverse(&dictionary);
             break;
         case 5:
-            length(&dictionary);
+            length(dictionary);
             break;
         case 6:
             add(&dictionary);
